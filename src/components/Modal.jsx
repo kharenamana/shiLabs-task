@@ -10,6 +10,7 @@ import {
   TableHead,
   TablePagination,
   TableRow,
+  TextField,
 } from '@mui/material';
 
 import CloseIcon from '@mui/icons-material/Close';
@@ -18,6 +19,7 @@ import { useState } from 'react';
 const Modal = ({ open, onClose, setOpen, allUsers }) => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -28,7 +30,16 @@ const Modal = ({ open, onClose, setOpen, allUsers }) => {
     setPage(0);
   };
 
-  console.log(allUsers);
+  const handleSearchChange = (event) => {
+    setSearchTerm(event.target.value);
+    setPage(0);
+  };
+
+  const filteredUsers = allUsers.filter((user) =>
+    user.name.firstname.toLowerCase().includes(searchTerm.toLowerCase()),
+  );
+
+  // console.log(allUsers);
   return (
     <Dialog onClose={onClose} open={open}>
       <div className="modal__header">
@@ -41,6 +52,13 @@ const Modal = ({ open, onClose, setOpen, allUsers }) => {
         />
       </div>
       <TableContainer>
+        <TextField
+          sx={{ margin: '0.5rem' }}
+          label="Search"
+          variant="outlined"
+          value={searchTerm}
+          onChange={handleSearchChange}
+        />
         <Table
         // sx={{ minWidth: 650 }}
         >
@@ -54,7 +72,7 @@ const Modal = ({ open, onClose, setOpen, allUsers }) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {allUsers
+            {filteredUsers
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((user) => (
                 <TableRow
@@ -81,9 +99,9 @@ const Modal = ({ open, onClose, setOpen, allUsers }) => {
           </TableBody>
         </Table>
         <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
+          rowsPerPageOptions={[3, 5, 8, 10]}
           component="div"
-          count={allUsers.length}
+          count={filteredUsers.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}
